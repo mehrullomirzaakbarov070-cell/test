@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hisobim — Shaxsiy moliya boshqaruvi</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <aside class="sidebar" aria-label="Asosiy menyu">
+      <div class="brand">
+        <div class="logo">💠</div>
+        <h1>Hisobim</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><button data-nav="dashboard" class="active">Dashboard</button></li>
+          <li><button data-nav="transactions">Tranzaksiyalar</button></li>
+          <li><button data-nav="budgets">Budjetlar</button></li>
+          <li><button data-nav="goals">Jamg‘armalar</button></li>
+          <li><button data-nav="export">Eksport/Import</button></li>
+          <li><button data-nav="settings">Sozlamalar</button></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="demoLoad">Demo ma'lumotlarni yuklash</button>
+        <button id="clearAll" class="danger">Barcha ma'lumotlarni o'chirish</button>
+      </div>
+    </aside>
+    <main class="main" id="main">
+      <header class="topbar">
+        <div class="search">
+          <input id="searchInput" placeholder="Izlash..." aria-label="Izlash tranzaksiyalar bo'yicha">
+        </div>
+        <div class="controls">
+          <label class="toggle">
+            <input id="themeToggle" type="checkbox" aria-label="Tungi rejim"> <span>Dark</span>
+          </label>
+          <select id="baseCurrency" aria-label="Asosiy valyuta">
+            <option value="UZS">UZS</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view">
+        <div class="cards">
+          <div class="card balance">
+            <h2>Joriy balans</h2>
+            <div class="values" id="balances"></div>
+          </div>
+          <div class="card income">
+            <h3>Daromad</h3>
+            <div id="summaryIncome"></div>
+          </div>
+          <div class="card expense">
+            <h3>Xarajat</h3>
+            <div id="summaryExpense"></div>
+          </div>
+          <div class="card goals">
+            <h3>Jamg'armalar</h3>
+            <div id="summaryGoals"></div>
+          </div>
+        </div>
+
+        <section class="charts">
+          <div class="chart" id="chart-months" aria-hidden="false">
+            <h4>Oylar bo'yicha daromad va xarajat</h4>
+            <canvas id="canvasMonths" width="600" height="300"></canvas>
+          </div>
+          <div class="chart" id="chart-categories">
+            <h4>Xarajatlar bo'yicha toifa</h4>
+            <canvas id="canvasCategories" width="300" height="300"></canvas>
+          </div>
+        </section>
+
+        <section class="recent">
+          <h4>Oxirgi tranzaksiyalar</h4>
+          <div id="recentList"></div>
+        </section>
+      </section>
+
+      <section id="view-transactions" class="view hidden">
+        <div class="toolbar">
+          <button id="addTx">Yangi tranzaksiya</button>
+          <div class="filters">
+            <select id="filterType"><option value="all">Hammasi</option><option value="income">Daromad</option><option value="expense">Xarajat</option></select>
+            <select id="filterCurrency"><option value="all">Barchasi</option><option value="UZS">UZS</option><option value="USD">USD</option></select>
+            <input id="filterFrom" type="date">
+            <input id="filterTo" type="date">
+            <button id="applyFilters">Filtrlarni qo'llash</button>
+            <button id="clearFilters">Tozalash</button>
+          </div>
+        </div>
+        <div id="transactionsContainer"></div>
+      </section>
+
+      <section id="view-budgets" class="view hidden">
+        <h3>Budjetlar</h3>
+        <div class="budget-controls" style="display:flex;gap:8px;margin-bottom:8px">
+          <button id="addBudget">Yangi oylik budjet</button>
+        </div>
+        <div id="budgetsList"></div>
+      </section>
+
+      <section id="view-goals" class="view hidden">
+        <h3>Jamg‘armalar</h3>
+        <div class="goal-controls" style="display:flex;gap:8px;margin-bottom:8px">
+          <button id="addGoal">Yangi jamg'arma</button>
+        </div>
+        <div id="goalsList"></div>
+      </section>
+
+      <section id="view-export" class="view hidden">
+        <h3>Eksport va Import</h3>
+        <div class="export-import">
+          <button id="exportJson">JSON eksport</button>
+          <button id="exportCsv">CSV eksport</button>
+          <input id="importFile" type="file" accept="application/json">
+        </div>
+      </section>
+
+      <section id="view-settings" class="view hidden">
+        <h3>Sozlamalar</h3>
+        <label>1 USD = <input id="usdRate" type="number" step="0.01" min="0"> UZS</label>
+        <p class="muted">Kurs qo'lda kiritiladi — jonli kurs emas.</p>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="diag" aria-hidden="false"></div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
