@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hisobim — Shaxsiy Moliya Boshqaruvi</title>
+    <style>
+        :root {
+            /* Light Theme Palette */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            
+            --accent-primary: #059669;
+            --accent-primary-hover: #047857;
+            --accent-light: #ecfdf5;
+            --accent-text: #065f46;
+            
+            --income-color: #10b981;
+            --income-bg: #d1fae5;
+            --expense-color: #ef4444;
+            --expense-bg: #fee2e2;
+            --warning-color: #f59e0b;
+            --warning-bg: #fef3c7;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            
+            --accent-primary: #10b981;
+            --accent-primary-hover: #059669;
+            --accent-light: rgba(16, 185, 129, 0.15);
+            --accent-text: #6ee7b7;
+            
+            --income-color: #34d399;
+            --income-bg: rgba(52, 211, 153, 0.15);
+            --expense-color: #f87171;
+            --expense-bg: rgba(248, 113, 113, 0.15);
+            --warning-color: #fbbf24;
+            --warning-bg: rgba(251, 191, 36, 0.15);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            line-height: 1.5;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 40;
+            transition: transform var(--transition-normal);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            transition: all var(--transition-fast);
+        }
+
+        .nav-item:hover, .nav-item:focus-visible {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .nav-item.active {
+            background-color: var(--accent-light);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Main Content Area */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .header {
+            height: 70px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .page-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            padding: 8px;
+            cursor: pointer;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .content {
+            padding: 32px;
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Utility Components */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all var(--transition-fast);
+            min-height: 44px;
+            min-width: 44px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        .btn-danger {
+            background-color: var(--expense-bg);
+            color: var(--expense-color);
+            border-color: transparent;
+        }
+        .btn-danger:hover {
+            background-color: var(--expense-color);
+            color: white;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+        }
+        .btn-icon:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Metrics Overview Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .metric-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-income {
+            background-color: var(--income-bg);
+            color: var(--income-color);
+        }
+
+        .badge-expense {
+            background-color: var(--expense-bg);
+            color: var(--expense-color);
+        }
+
+        /* Dashboard Specific Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color var(--transition-fast);
+            min-height: 44px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .form-error {
+            color: var(--expense-color);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-group.has-error .form-error {
+            display: block;
+        }
+
+        .form-group.has-error .form-control {
+            border-color: var(--expense-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-bar .form-control {
+            width: auto;
+            min-width: 140px;
+        }
+
+        /* Table & List View */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* Responsive Mobile Transactions List */
+        .transaction-cards {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tx-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tx-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tx-card-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .tx-card-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 8px;
+        }
+
+        .tx-card-amount {
+            text-align: right;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Modal Component */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+            padding: 16px;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.95);
+            transition: transform var(--transition-normal);
+        }
+
+        .modal-backdrop.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background-color: var(--bg-tertiary);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--accent-primary);
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-bar-fill.warning {
+            background-color: var(--warning-color);
+        }
+
+        .progress-bar-fill.danger {
+            background-color: var(--expense-color);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 110;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            background-color: var(--text-primary);
+            color: var(--bg-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all var(--transition-normal);
+            pointer-events: auto;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Views management */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Charts Canvas Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 260px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+            stroke: var(--text-muted);
+        }
+
+        /* Responsiveness Media Queries */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header {
+                padding: 0 16px;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-responsive {
+                display: none;
+            }
+
+            .transaction-cards {
+                display: flex;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Nav -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <span class="brand-title">Hisobim</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-target="dashboard-view">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    Dashboard
+                </button>
+                <button class="nav-item" data-target="transactions-view">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Tranzaksiyalar
+                </button>
+                <button class="nav-item" data-target="budgets-view">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                    Budjetlar
+                </button>
+                <button class="nav-item" data-target="goals-view">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    Jamg'armalar
+                </button>
+                <button class="nav-item" data-target="settings-view">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Sozlamalar
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Mavzu:</span>
+                <button class="btn-icon" id="theme-toggle" aria-label="Mavzuni o'zgartirish">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="header">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menuni ochish">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="add-tx-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Yangi yozuv
+                    </button>
+                </div>
+            </header>
+
+            <main class="content">
+
+                <!-- DASHBOARD VIEW -->
+                <section class="view-section active" id="dashboard-view">
+                    <!-- Metrics Cards -->
+                    <div class="metrics-grid">
+                        <div class="card metric-card">
+                            <div class="metric-label">Joriy Balans (UZS)</div>
+                            <div class="metric-value" id="balance-uzs">0 UZS</div>
+                            <div class="metric-sub">Sof ma'lumotlar hisobi</div>
+                        </div>
+                        <div class="card metric-card">
+                            <div class="metric-label">Joriy Balans (USD)</div>
+                            <div class="metric-value" id="balance-usd">$0.00</div>
+                            <div class="metric-sub">Sof ma'lumotlar hisobi</div>
+                        </div>
+                        <div class="card metric-card">
+                            <div class="metric-label">
+                                Umumiy Ekvivalent
+                                <span class="badge badge-income" id="main-currency-badge">UZS</span>
+                            </div>
+                            <div class="metric-value" id="total-equiv">0 UZS</div>
+                            <div class="metric-sub" id="equiv-rate-info">Kurs: sozlanmagan</div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar for Dashboard Overview -->
+                    <div class="filters-bar">
+                        <label for="dash-period" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary)">Davr:</label>
+                        <select class="form-control" id="dash-period">
+                            <option value="month" selected>Shu oy</option>
+                            <option value="today">Bugun</option>
+                            <option value="week">Shu hafta</option>
+                            <option value="year">Shu yil</option>
+                            <option value="all">Barcha vaqt</option>
+                        </select>
+                        
+                        <label for="dash-currency" style="font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-left:12px;">Valyuta:</label>
+                        <select class="form-control" id="dash-currency">
+                            <option value="ALL">Barchasi (Ekvivalent)</option>
+                            <option value="UZS">Faqat UZS</option>
+                            <option value="USD">Faqat USD</option>
+                        </select>
+                    </div>
+
+                    <!-- Period Summary Sub-metrics -->
+                    <div class="metrics-grid">
+                        <div class="card">
+                            <div class="metric-label">Davr Daromadi</div>
+                            <div class="metric-value" style="color:var(--income-color)" id="period-income">0</div>
+                        </div>
+                        <div class="card">
+                            <div class="metric-label">Davr Xarajati</div>
+                            <div class="metric-value" style="color:var(--expense-color)" id="period-expense">0</div>
+                        </div>
+                        <div class="card">
+                            <div class="metric-label">Davr Sof Natijasi</div>
+                            <div class="metric-value" id="period-net">0</div>
+                        </div>
+                        <div class="card">
+                            <div class="metric-label">Eng Katta Xarajat</div>
+                            <div class="metric-value" style="font-size:1.2rem;" id="top-expense-cat">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Charts Grid -->
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Oylar Kesimida Dinamika</h2>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Xarajatlar Strukturasi</h2>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Oxirgi Tranzaksiyalar</h2>
+                            <button class="btn btn-secondary" onclick="app.navigateTo('transactions-view')">Barchasini ko'rish</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sana</th>
+                                        <th>Kategoriya</th>
+                                        <th>Izoh</th>
+                                        <th>Turi</th>
+                                        <th>Summa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-tx-table">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="transaction-cards" id="recent-tx-cards">
+                            <!-- Dynamic Mobile Cards -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TRANSACTIONS VIEW -->
+                <section class="view-section" id="transactions-view">
+                    <div class="filters-bar">
+                        <input type="text" class="form-control" id="tx-search" placeholder="Izoh bo'yicha qidiruv...">
+                        <select class="form-control" id="tx-type-filter">
+                            <option value="ALL">Barcha turlar</option>
+                            <option value="INCOME">Daromad</option>
+                            <option value="EXPENSE">Xarajat</option>
+                        </select>
+                        <select class="form-control" id="tx-cat-filter">
+                            <option value="ALL">Barcha kategoriyalar</option>
+                        </select>
+                        <select class="form-control" id="tx-curr-filter">
+                            <option value="ALL">Barcha valyutalar</option>
+                            <option value="UZS">UZS</option>
+                            <option value="USD">USD</option>
+                        </select>
+                        <select class="form-control" id="tx-sort">
+                            <option value="date-desc">Sana (Yangi -> Eski)</option>
+                            <option value="date-asc">Sana (Eski -> Yangi)</option>
+                            <option value="amount-desc">Summa (Katta -> Kichik)</option>
+                            <option value="amount-asc">Summa (Kichik -> Katta)</option>
+                        </select>
+                        <button class="btn btn-secondary" id="tx-reset-filters">Tozalash</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sana</th>
+                                        <th>Kategoriya</th>
+                                        <th>Izoh</th>
+                                        <th>Turi</th>
+                                        <th>Summa</th>
+                                        <th style="text-align:right;">Amallar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="all-tx-table">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="transaction-cards" id="all-tx-cards">
+                            <!-- Dynamic -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BUDGETS VIEW -->
+                <section class="view-section" id="budgets-view">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                        <p style="color:var(--text-secondary);">Joriy oy uchun xarajat limitlarini belgilang va sarflaringizni nazorat qiling.</p>
+                        <button class="btn btn-primary" id="add-budget-btn">Yangi Limit</button>
+                    </div>
+
+                    <div class="metrics-grid" id="budgets-grid">
+                        <!-- Dynamic Budgets list -->
+                    </div>
+                </section>
+
+                <!-- GOALS VIEW -->
+                <section class="view-section" id="goals-view">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <p style="color:var(--text-secondary);">Jamg'arma maqsadlari — alohida kuzatuv hisobidir. Ular umumiy balansingizga ta'sir qilmaydi.</p>
+                        <button class="btn btn-primary" id="add-goal-btn">Yangi Maqsad</button>
+                    </div>
+
+                    <div class="metrics-grid" id="goals-grid">
+                        <!-- Dynamic Goals List -->
+                    </div>
+                </section>
+
+                <!-- SETTINGS VIEW -->
+                <section class="view-section" id="settings-view">
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <h2 class="card-title" style="margin-bottom:16px;">Valyuta va Kurs Sozlamalari</h2>
+                            <form id="settings-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="setting-main-currency">Asosiy Ko'rsatkich Valyutasi</label>
+                                    <select class="form-control" id="setting-main-currency">
+                                        <option value="UZS">UZS (So'm)</option>
+                                        <option value="USD">USD (Dollar)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="setting-usd-rate">1 USD kursi (UZS da)</label>
+                                    <input type="number" class="form-control" id="setting-usd-rate" placeholder="Masalan: 12500" step="any" min="0">
+                                    <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">
+                                        Eslatma: Bu qo'lda kiritiladigan shartli kurs bo'lib, jonli valyuta birjasiga bog'lanmagan. Barcha ekvivalent hisobotlar ushbu kurs bo'yicha yangilanadi.
+                                    </small>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Sozlamalarni Saqlash</button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <h2 class="card-title" style="margin-bottom:16px;">Kategoriyalarni Boshqarish</h2>
+                            <form id="add-category-form" style="display:flex; gap:8px; margin-bottom:16px;">
+                                <input type="text" class="form-control" id="new-cat-name" placeholder="Yangi kategoriya..." required>
+                                <select class="form-control" id="new-cat-type" style="width:130px;">
+                                    <option value="EXPENSE">Xarajat</option>
+                                    <option value="INCOME">Daromad</option>
+                                </select>
+                                <button type="submit" class="btn btn-secondary">+</button>
+                            </form>
+                            <div id="categories-list" style="max-height:250px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+                                <!-- Dynamic categories -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:24px;">
+                        <h2 class="card-title" style="margin-bottom:16px;">Ma'lumotlar Zaxirasi va Boshqaruv</h2>
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                            Barcha ma'lumotlar brauzeringizning local storage xotirasida saqlanadi (shifrlanmagan). Qurilmalararo sinxronizatsiya mavjud emas.
+                        </p>
+                        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                            <button class="btn btn-secondary" id="export-json-btn">JSON Eksport</button>
+                            <button class="btn btn-secondary" id="export-csv-btn">CSV Eksport (Tranzaksiyalar)</button>
+                            <label class="btn btn-secondary" style="cursor:pointer;">
+                                JSON Import
+                                <input type="file" id="import-json-file" accept=".json" style="display:none;">
+                            </label>
+                            <button class="btn btn-secondary" id="load-demo-btn">Demo Ma'lumotlarni Yuklash</button>
+                            <button class="btn btn-danger" id="clear-all-btn">Barcha Ma'lumotlarni O'chirish</button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT TRANSACTION -->
+    <div class="modal-backdrop" id="tx-modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tx-modal-title">
+            <div class="modal-header">
+                <h3 class="card-title" id="tx-modal-title">Yangi Tranzaksiya</h3>
+                <button class="btn-icon modal-close" aria-label="Yopish">&times;</button>
+            </div>
+            <form id="tx-form">
+                <div class="modal-body">
+                    <input type="hidden" id="tx-id">
+                    <div class="form-group">
+                        <label class="form-label">Tranzaksiya Turi</label>
+                        <div class="form-row">
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="radio" name="tx-type" value="EXPENSE" checked> Xarajat
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="radio" name="tx-type" value="INCOME"> Daromad
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="tx-amount">Summa</label>
+                            <input type="number" step="any" min="0.01" class="form-control" id="tx-amount" placeholder="0.00" required>
+                            <div class="form-error">To'g'ri musbat summa kiriting</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="tx-currency">Valyuta</label>
+                            <select class="form-control" id="tx-currency">
+                                <option value="UZS">UZS</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="tx-category">Kategoriya</label>
+                        <select class="form-control" id="tx-category" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="tx-date">Sana</label>
+                        <input type="date" class="form-control" id="tx-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="tx-note">Izoh (ixtiyoriy)</label>
+                        <input type="text" class="form-control" id="tx-note" placeholder="Masalan: Tushlik yoki Ish haqi">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary" id="tx-submit-btn">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD BUDGET -->
+    <div class="modal-backdrop" id="budget-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3 class="card-title">Oylik Limit Belgilash</h3>
+                <button class="btn-icon modal-close">&times;</button>
+            </div>
+            <form id="budget-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="budget-category">Kategoriya</label>
+                        <select class="form-control" id="budget-category" required></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="budget-amount">Limit Summasi</label>
+                            <input type="number" step="any" min="1" class="form-control" id="budget-amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="budget-currency">Valyuta</label>
+                            <select class="form-control" id="budget-currency">
+                                <option value="UZS">UZS</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD GOAL -->
+    <div class="modal-backdrop" id="goal-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3 class="card-title">Yangi Jamg'arma Maqsadi</h3>
+                <button class="btn-icon modal-close">&times;</button>
+            </div>
+            <form id="goal-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="goal-title">Maqsad Nomi</label>
+                        <input type="text" class="form-control" id="goal-title" placeholder="Masalan: Avtomobil uchun" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="goal-target">Maqsad Summasi</label>
+                            <input type="number" step="any" min="1" class="form-control" id="goal-target" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="goal-currency">Valyuta</label>
+                            <select class="form-control" id="goal-currency">
+                                <option value="UZS">UZS</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="goal-deadline">Muddat (Ixtiyoriy)</label>
+                        <input type="date" class="form-control" id="goal-deadline">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: GOAL DEPOSIT/WITHDRAW -->
+    <div class="modal-backdrop" id="goal-action-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3 class="card-title" id="goal-action-title">Mablag' Boshqaruvi</h3>
+                <button class="btn-icon modal-close">&times;</button>
+            </div>
+            <form id="goal-action-form">
+                <div class="modal-body">
+                    <input type="hidden" id="goal-action-id">
+                    <input type="hidden" id="goal-action-type">
+                    <div class="form-group">
+                        <label class="form-label" for="goal-action-amount">Summa</label>
+                        <input type="number" step="any" min="0.01" class="form-control" id="goal-action-amount" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary">Tasdiqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Area -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+    /**
+     * HISOBIM - Single File Vanilla JavaScript Application Module
+     */
+
+    // --- 1. STORAGE MODULE ---
+    const Storage = {
+        KEY: 'hisobim_app_state_v1',
+        
+        getInitialData() {
+            return {
+                version: 1,
+                settings: {
+                    mainCurrency: 'UZS',
+                    usdRate: 12500, // Default 1 USD = 12500 UZS
+                    theme: 'system'
+                },
+                categories: [
+                    { id: 'c1', name: 'Ish haqi', type: 'INCOME', isDefault: true },
+                    { id: 'c2', name: 'Freelance', type: 'INCOME', isDefault: true },
+                    { id: 'c3', name: 'Biznes', type: 'INCOME', isDefault: true },
+                    { id: 'c4', name: 'Sovg\'a', type: 'INCOME', isDefault: true },
+                    { id: 'c5', name: 'Boshqa daromad', type: 'INCOME', isDefault: true },
+                    { id: 'c6', name: 'Oziq-ovqat', type: 'EXPENSE', isDefault: true },
+                    { id: 'c7', name: 'Transport', type: 'EXPENSE', isDefault: true },
+                    { id: 'c8', name: 'Uy-joy', type: 'EXPENSE', isDefault: true },
+                    { id: 'c9', name: 'Kommunal', type: 'EXPENSE', isDefault: true },
+                    { id: 'c10', name: 'Sog\'liq', type: 'EXPENSE', isDefault: true },
+                    { id: 'c11', name: 'Ta\'lim', type: 'EXPENSE', isDefault: true },
+                    { id: 'c12', name: 'Ko\'ngilochar', type: 'EXPENSE', isDefault: true },
+                    { id: 'c13', name: 'Xaridlar', type: 'EXPENSE', isDefault: true },
+                    { id: 'c14', name: 'Boshqa xarajat', type: 'EXPENSE', isDefault: true }
+                ],
+                transactions: [],
+                budgets: [],
+                goals: []
+            };
+        },
+
+        load() {
+            try {
+                const dataStr = localStorage.getItem(this.KEY);
+                if (!dataStr) return this.getInitialData();
+                const parsed = JSON.parse(dataStr);
+                if (!parsed || parsed.version !== 1) return this.getInitialData();
+                return parsed;
+            } catch (e) {
+                console.error("Storage loading error", e);
+                return this.getInitialData();
+            }
+        },
+
+        save(state) {
+            try {
+                localStorage.setItem(this.KEY, JSON.stringify(state));
+                return true;
+            } catch (e) {
+                console.error("Storage saving error", e);
+                return false;
+            }
+        }
+    };
+
+    // --- 2. FORMATTING & CURRENCY UTILS ---
+    const Utils = {
+        generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        },
+
+        formatCurrency(amount, currency) {
+            const num = Number(amount) || 0;
+            if (currency === 'USD') {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+            }
+            return new Intl.NumberFormat('uz-UZ').format(num) + ' UZS';
+        },
+
+        escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        },
+
+        getTodayString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    };
+
+    // --- 3. CORE APP CONTROLLER ---
+    class HisobimApp {
+        constructor() {
+            this.state = Storage.load();
+            this.activeView = 'dashboard-view';
+            this.init();
+        }
+
+        init() {
+            this.setupTheme();
+            this.bindEvents();
+            this.renderAll();
+        }
+
+        saveState() {
+            const saved = Storage.save(this.state);
+            if (!saved) {
+                this.showToast('Xatolik: Ma\'lumotlarni saqlab bo\'lmadi!');
+            }
+        }
+
+        setupTheme() {
+            const savedTheme = this.state.settings.theme;
+            if (savedTheme === 'dark' || (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+
+        toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            if (next === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            this.state.settings.theme = next;
+            this.saveState();
+        }
+
+        showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- NAVIGATION & ROUTING ---
+        navigateTo(targetView) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.target === targetView);
+            });
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.toggle('active', el.id === targetView);
+            });
+
+            const titles = {
+                'dashboard-view': 'Dashboard',
+                'transactions-view': 'Tranzaksiyalar',
+                'budgets-view': 'Oylik Budjetlar',
+                'goals-view': 'Jamg\'arma Maqsadi',
+                'settings-view': 'Sozlamalar'
+            };
+            document.getElementById('page-title').textContent = titles[targetView] || 'Hisobim';
+            this.activeView = targetView;
+
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.remove('mobile-open');
+
+            this.renderAll();
+        }
+
+        // --- CALCULATION LOGIC ---
+        convert(amount, fromCurr, toCurr) {
+            if (fromCurr === toCurr) return amount;
+            const rate = Number(this.state.settings.usdRate) || 0;
+            if (rate <= 0) return 0;
+
+            if (fromCurr === 'USD' && toCurr === 'UZS') {
+                return amount * rate;
+            }
+            if (fromCurr === 'UZS' && toCurr === 'USD') {
+                return amount / rate;
+            }
+            return amount;
+        }
+
+        calculateBalances() {
+            let uzs = 0;
+            let usd = 0;
+
+            this.state.transactions.forEach(tx => {
+                const val = Number(tx.amount) || 0;
+                if (tx.currency === 'UZS') {
+                    uzs += (tx.type === 'INCOME' ? val : -val);
+                } else if (tx.currency === 'USD') {
+                    usd += (tx.type === 'INCOME' ? val : -val);
+                }
+            });
+
+            const mainCurr = this.state.settings.mainCurrency;
+            let totalEquiv = 0;
+            if (mainCurr === 'UZS') {
+                totalEquiv = uzs + this.convert(usd, 'USD', 'UZS');
+            } else {
+                totalEquiv = usd + this.convert(uzs, 'UZS', 'USD');
+            }
+
+            return { uzs, usd, totalEquiv, mainCurr };
+        }
+
+        filterTransactionsByPeriod(txs, period) {
+            if (period === 'all') return txs;
+            const now = new Date();
+            const todayStr = Utils.getTodayString();
+
+            return txs.filter(tx => {
+                if (period === 'today') return tx.date === todayStr;
+                
+                const txDate = new Date(tx.date);
+                if (period === 'week') {
+                    const diffTime = Math.abs(now - txDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays <= 7;
+                }
+                if (period === 'month') {
+                    return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+                }
+                if (period === 'year') {
+                    return txDate.getFullYear() === now.getFullYear();
+                }
+                return true;
+            });
+        }
+
+        // --- RENDERING MODULES ---
+        renderAll() {
+            this.renderDashboard();
+            this.renderTransactions();
+            this.renderBudgets();
+            this.renderGoals();
+            this.renderSettings();
+            this.populateCategorySelects();
+        }
+
+        renderDashboard() {
+            const { uzs, usd, totalEquiv, mainCurr } = this.calculateBalances();
+            document.getElementById('balance-uzs').textContent = Utils.formatCurrency(uzs, 'UZS');
+            document.getElementById('balance-usd').textContent = Utils.formatCurrency(usd, 'USD');
+            document.getElementById('total-equiv').textContent = Utils.formatCurrency(totalEquiv, mainCurr);
+            document.getElementById('main-currency-badge').textContent = mainCurr;
+
+            const rate = this.state.settings.usdRate;
+            document.getElementById('equiv-rate-info').textContent = rate > 0 
+                ? `Kurs: 1 USD = ${Utils.formatCurrency(rate, 'UZS')}` 
+                : 'Kurs sozlanmagan!';
+
+            // Period summary
+            const period = document.getElementById('dash-period').value;
+            const currFilter = document.getElementById('dash-currency').value;
+            let filtered = this.filterTransactionsByPeriod(this.state.transactions, period);
+
+            let pIncome = 0, pExpense = 0;
+            const targetCurr = currFilter === 'ALL' ? mainCurr : currFilter;
+
+            const categoryExpenses = {};
+
+            filtered.forEach(tx => {
+                if (currFilter !== 'ALL' && tx.currency !== currFilter) return;
+
+                let amt = Number(tx.amount) || 0;
+                if (currFilter === 'ALL') {
+                    amt = this.convert(amt, tx.currency, mainCurr);
+                }
+
+                if (tx.type === 'INCOME') {
+                    pIncome += amt;
+                } else {
+                    pExpense += amt;
+                    categoryExpenses[tx.categoryId] = (categoryExpenses[tx.categoryId] || 0) + amt;
+                }
+            });
+
+            document.getElementById('period-income').textContent = Utils.formatCurrency(pIncome, targetCurr);
+            document.getElementById('period-expense').textContent = Utils.formatCurrency(pExpense, targetCurr);
+            document.getElementById('period-net').textContent = Utils.formatCurrency(pIncome - pExpense, targetCurr);
+
+            // Find top expense category
+            let topCatId = null, maxExp = 0;
+            for (let catId in categoryExpenses) {
+                if (categoryExpenses[catId] > maxExp) {
+                    maxExp = categoryExpenses[catId];
+                    topCatId = catId;
+                }
+            }
+            const topCat = this.state.categories.find(c => c.id === topCatId);
+            document.getElementById('top-expense-cat').textContent = topCat ? `${topCat.name}` : '-';
+
+            // Recent table
+            const recent = [...this.state.transactions]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+
+            this.renderTxTableRows(recent, 'recent-tx-table', 'recent-tx-cards', false);
+
+            // Charts
+            this.renderCharts(filtered, targetCurr);
+        }
+
+        renderTxTableRows(txList, tableId, cardsId, showActions = true) {
+            const tbody = document.getElementById(tableId);
+            const cardsContainer = document.getElementById(cardsId);
+            tbody.innerHTML = '';
+            cardsContainer.innerHTML = '';
+
+            if (txList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${showActions ? 6 : 5}" class="empty-state">Yozuvlar topilmadi</td></tr>`;
+                cardsContainer.innerHTML = `<div class="empty-state">Yozuvlar topilmadi</div>`;
+                return;
+            }
+
+            txList.forEach(tx => {
+                const cat = this.state.categories.find(c => c.id === tx.categoryId);
+                const catName = cat ? cat.name : 'Boshqa';
+                const isInc = tx.type === 'INCOME';
+                const sign = isInc ? '+' : '-';
+                const badgeClass = isInc ? 'badge-income' : 'badge-expense';
+
+                // Table Row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${tx.date}</td>
+                    <td>${Utils.escapeHTML(catName)}</td>
+                    <td>${Utils.escapeHTML(tx.note || '-')}</td>
+                    <td><span class="badge ${badgeClass}">${isInc ? 'Daromad' : 'Xarajat'}</span></td>
+                    <td style="font-weight:600; color:${isInc ? 'var(--income-color)' : 'var(--expense-color)'}">
+                        ${sign} ${Utils.formatCurrency(tx.amount, tx.currency)}
+                    </td>
+                    ${showActions ? `
+                        <td style="text-align:right;">
+                            <button class="btn-icon" onclick="app.editTx('${tx.id}')">✏️</button>
+                            <button class="btn-icon" onclick="app.deleteTx('${tx.id}')">🗑️</button>
+                        </td>
+                    ` : ''}
+                `;
+                tbody.appendChild(tr);
+
+                // Mobile Card View
+                const card = document.createElement('div');
+                card.className = 'tx-card';
+                card.innerHTML = `
+                    <div class="tx-card-info">
+                        <div class="tx-card-title">${Utils.escapeHTML(catName)}</div>
+                        <div class="tx-card-meta">
+                            <span>${tx.date}</span>
+                            <span>•</span>
+                            <span>${Utils.escapeHTML(tx.note || '')}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="tx-card-amount" style="color:${isInc ? 'var(--income-color)' : 'var(--expense-color)'}">
+                            ${sign} ${Utils.formatCurrency(tx.amount, tx.currency)}
+                        </div>
+                        ${showActions ? `
+                            <div style="text-align:right; margin-top:4px;">
+                                <button class="btn-icon" onclick="app.editTx('${tx.id}')">✏️</button>
+                                <button class="btn-icon" onclick="app.deleteTx('${tx.id}')">🗑️</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        renderTransactions() {
+            let txs = [...this.state.transactions];
+
+            // Apply Filters
+            const search = document.getElementById('tx-search').value.toLowerCase();
+            const type = document.getElementById('tx-type-filter').value;
+            const cat = document.getElementById('tx-cat-filter').value;
+            const curr = document.getElementById('tx-curr-filter').value;
+            const sort = document.getElementById('tx-sort').value;
+
+            if (search) {
+                txs = txs.filter(t => (t.note || '').toLowerCase().includes(search));
+            }
+            if (type !== 'ALL') {
+                txs = txs.filter(t => t.type === type);
+            }
+            if (cat !== 'ALL') {
+                txs = txs.filter(t => t.categoryId === cat);
+            }
+            if (curr !== 'ALL') {
+                txs = txs.filter(t => t.currency === curr);
+            }
+
+            // Sorting
+            txs.sort((a, b) => {
+                if (sort === 'date-desc') return new Date(b.date) - new Date(a.date);
+                if (sort === 'date-asc') return new Date(a.date) - new Date(b.date);
+                if (sort === 'amount-desc') return b.amount - a.amount;
+                if (sort === 'amount-asc') return a.amount - b.amount;
+                return 0;
+            });
+
+            this.renderTxTableRows(txs, 'all-tx-table', 'all-tx-cards', true);
+        }
+
+        renderBudgets() {
+            const container = document.getElementById('budgets-grid');
+            container.innerHTML = '';
+
+            if (this.state.budgets.length === 0) {
+                container.innerHTML = `<div class="card empty-state" style="grid-column:1/-1">Oylik xarajat limitlari hali kiritilmagan.</div>`;
+                return;
+            }
+
+            const now = new Date();
+            const currentMonthTxs = this.state.transactions.filter(t => {
+                const d = new Date(t.date);
+                return t.type === 'EXPENSE' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+
+            this.state.budgets.forEach(b => {
+                const cat = this.state.categories.find(c => c.id === b.categoryId);
+                const catName = cat ? cat.name : 'Noma\'lum';
+
+                // Calculate spent in budget currency
+                let spent = 0;
+                currentMonthTxs.filter(t => t.categoryId === b.categoryId).forEach(t => {
+                    spent += this.convert(t.amount, t.currency, b.currency);
+                });
+
+                const percent = Math.min(Math.round((spent / b.amount) * 100), 100);
+                let barClass = '';
+                if (percent >= 100) barClass = 'danger';
+                else if (percent >= 80) barClass = 'warning';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header" style="margin-bottom:12px;">
+                        <h3 class="card-title">${Utils.escapeHTML(catName)}</h3>
+                        <button class="btn-icon" onclick="app.deleteBudget('${b.id}')">🗑️</button>
+                    </div>
+                    <div style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:8px;">
+                        Sarflandi: <strong>${Utils.formatCurrency(spent, b.currency)}</strong> / ${Utils.formatCurrency(b.amount, b.currency)}
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill ${barClass}" style="width: ${percent}%;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:6px;">
+                        <span>${percent}% ishlatildi</span>
+                        <span>Qoldi: ${Utils.formatCurrency(Math.max(0, b.amount - spent), b.currency)}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderGoals() {
+            const container = document.getElementById('goals-grid');
+            container.innerHTML = '';
+
+            if (this.state.goals.length === 0) {
+                container.innerHTML = `<div class="card empty-state" style="grid-column:1/-1">Hali hech qanday jamg'arma maqsadi yo'q.</div>`;
+                return;
+            }
+
+            this.state.goals.forEach(g => {
+                const current = g.currentAmount || 0;
+                const percent = Math.min(Math.round((current / g.targetAmount) * 100), 100);
+                const isReached = current >= g.targetAmount;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header" style="margin-bottom:12px;">
+                        <h3 class="card-title">${Utils.escapeHTML(g.title)} ${isReached ? '🎉' : ''}</h3>
+                        <button class="btn-icon" onclick="app.deleteGoal('${g.id}')">🗑️</button>
+                    </div>
+                    <div style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:8px;">
+                        Yig'ildi: <strong>${Utils.formatCurrency(current, g.currency)}</strong> / ${Utils.formatCurrency(g.targetAmount, g.currency)}
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:8px; margin-bottom:16px;">
+                        <span>${percent}% bajarildi</span>
+                        <span>${g.deadline ? 'Muddat: ' + g.deadline : ''}</span>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-secondary" style="flex:1" onclick="app.openGoalAction('${g.id}', 'DEPOSIT')">+ Qo'shish</button>
+                        <button class="btn btn-secondary" style="flex:1" onclick="app.openGoalAction('${g.id}', 'WITHDRAW')">- Qaytarish</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderSettings() {
+            document.getElementById('setting-main-currency').value = this.state.settings.mainCurrency;
+            document.getElementById('setting-usd-rate').value = this.state.settings.usdRate;
+
+            const catContainer = document.getElementById('categories-list');
+            catContainer.innerHTML = '';
+
+            this.state.categories.forEach(c => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--bg-primary); border-radius:var(--radius-sm); border:1px solid var(--border-color)';
+                item.innerHTML = `
+                    <span>${Utils.escapeHTML(c.name)} <small style="color:var(--text-muted)">(${c.type === 'INCOME' ? 'Daromad' : 'Xarajat'})</small></span>
+                    ${!c.isDefault ? `<button class="btn-icon" onclick="app.deleteCategory('${c.id}')">🗑️</button>` : ''}
+                `;
+                catContainer.appendChild(item);
+            });
+        }
+
+        populateCategorySelects() {
+            const txType = document.querySelector('input[name="tx-type"]:checked')?.value || 'EXPENSE';
+            const txCatSelect = document.getElementById('tx-category');
+            const txFilterSelect = document.getElementById('tx-cat-filter');
+            const budgetCatSelect = document.getElementById('budget-category');
+
+            txCatSelect.innerHTML = '';
+            budgetCatSelect.innerHTML = '';
+            
+            // Filter dropdown
+            txFilterSelect.innerHTML = '<option value="ALL">Barcha kategoriyalar</option>';
+
+            this.state.categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                
+                txFilterSelect.appendChild(opt);
+
+                if (c.type === txType) {
+                    txCatSelect.appendChild(opt.cloneNode(true));
+                }
+                if (c.type === 'EXPENSE') {
+                    budgetCatSelect.appendChild(opt.cloneNode(true));
+                }
+            });
+        }
+
+        // --- NATIVE CANVAS CHARTS IMPLEMENTATION ---
+        renderCharts(txList, activeCurrency) {
+            this.renderMonthlyChart(txList, activeCurrency);
+            this.renderCategoryChart(txList, activeCurrency);
+        }
+
+        renderMonthlyChart(txList, activeCurrency) {
+            const canvas = document.getElementById('monthlyChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust resolution for High DPI displays
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Group transactions by month (last 6 months)
+            const months = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date();
+                d.setMonth(d.getMonth() - i);
+                months.push({
+                    month: d.getMonth(),
+                    year: d.getFullYear(),
+                    label: d.toLocaleString('uz-UZ', { month: 'short' }),
+                    income: 0,
+                    expense: 0
+                });
+            }
+
+            txList.forEach(t => {
+                const d = new Date(t.date);
+                const m = months.find(x => x.month === d.getMonth() && x.year === d.getFullYear());
+                if (m) {
+                    const amt = this.convert(t.amount, t.currency, activeCurrency);
+                    if (t.type === 'INCOME') m.income += amt;
+                    else m.expense += amt;
+                }
+            });
+
+            // Drawing logic
+            const maxVal = Math.max(...months.map(m => Math.max(m.income, m.expense)), 1);
+            const padding = 30;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+            const barWidth = chartWidth / (months.length * 3);
+
+            months.forEach((m, idx) => {
+                const xBase = padding + idx * (chartWidth / months.length) + 10;
+                
+                // Income Bar
+                const incHeight = (m.income / maxVal) * chartHeight;
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(xBase, height - padding - incHeight, barWidth, incHeight);
+
+                // Expense Bar
+                const expHeight = (m.expense / maxVal) * chartHeight;
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(xBase + barWidth + 4, height - padding - expHeight, barWidth, expHeight);
+
+                // Label
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-muted');
+                ctx.font = '10px sans-serif';
+                ctx.fillText(m.label, xBase, height - 10);
+            });
+        }
+
+        renderCategoryChart(txList, activeCurrency) {
+            const canvas = document.getElementById('categoryChart');
+            const ctx = canvas.getContext('2d');
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Expense categories aggregation
+            const expMap = {};
+            txList.filter(t => t.type === 'EXPENSE').forEach(t => {
+                const amt = this.convert(t.amount, t.currency, activeCurrency);
+                expMap[t.categoryId] = (expMap[t.categoryId] || 0) + amt;
+            });
+
+            const totalExp = Object.values(expMap).reduce((a, b) => a + b, 0);
+
+            if (totalExp === 0) {
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-muted');
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText("Xarajat ma'lumotlari yo'q", width / 2, height / 2);
+                return;
+            }
+
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
+            let startAngle = 0;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 3;
+
+            let colorIdx = 0;
+            for (let catId in expMap) {
+                const sliceAngle = (expMap[catId] / totalExp) * 2 * Math.PI;
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.arc(centerX, centerY, radius * 0.5, startAngle + sliceAngle, startAngle, true);
+                ctx.closePath();
+
+                ctx.fillStyle = colors[colorIdx % colors.length];
+                ctx.fill();
+
+                startAngle += sliceAngle;
+                colorIdx++;
+            }
+        }
+
+        // --- ACTIONS & MODAL HANDLERS ---
+        bindEvents() {
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => this.navigateTo(e.currentTarget.dataset.target));
+            });
+
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
+
+            // Mobile Menu
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('mobile-open');
+            });
+
+            // Modals Close
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+                });
+            });
+
+            // Transaction modal open
+            document.getElementById('add-tx-btn').addEventListener('click', () => {
+                document.getElementById('tx-id').value = '';
+                document.getElementById('tx-form').reset();
+                document.getElementById('tx-date').value = Utils.getTodayString();
+                this.populateCategorySelects();
+                document.getElementById('tx-modal').classList.add('active');
+            });
+
+            // Transaction Type Change inside Modal
+            document.querySelectorAll('input[name="tx-type"]').forEach(radio => {
+                radio.addEventListener('change', () => this.populateCategorySelects());
+            });
+
+            // Submit Transaction
+            document.getElementById('tx-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveTransaction();
+            });
+
+            // Transaction Filters Trigger
+            ['tx-search', 'tx-type-filter', 'tx-cat-filter', 'tx-curr-filter', 'tx-sort'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => this.renderTransactions());
+            });
+
+            document.getElementById('tx-reset-filters').addEventListener('click', () => {
+                document.getElementById('tx-search').value = '';
+                document.getElementById('tx-type-filter').value = 'ALL';
+                document.getElementById('tx-cat-filter').value = 'ALL';
+                document.getElementById('tx-curr-filter').value = 'ALL';
+                document.getElementById('tx-sort').value = 'date-desc';
+                this.renderTransactions();
+            });
+
+            // Dashboard filter triggers
+            ['dash-period', 'dash-currency'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => this.renderDashboard());
+            });
+
+            // Budgets & Goals Modals
+            document.getElementById('add-budget-btn').addEventListener('click', () => {
+                document.getElementById('budget-modal').classList.add('active');
+            });
+
+            document.getElementById('budget-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveBudget();
+            });
+
+            document.getElementById('add-goal-btn').addEventListener('click', () => {
+                document.getElementById('goal-modal').classList.add('active');
+            });
+
+            document.getElementById('goal-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveGoal();
+            });
+
+            document.getElementById('goal-action-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.processGoalAction();
+            });
+
+            // Settings & Categories
+            document.getElementById('settings-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.state.settings.mainCurrency = document.getElementById('setting-main-currency').value;
+                this.state.settings.usdRate = Number(document.getElementById('setting-usd-rate').value) || 0;
+                this.saveState();
+                this.showToast('Sozlamalar saqlandi');
+                this.renderAll();
+            });
+
+            document.getElementById('add-category-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('new-cat-name').value.trim();
+                const type = document.getElementById('new-cat-type').value;
+
+                if (name) {
+                    this.state.categories.push({
+                        id: Utils.generateId(),
+                        name,
+                        type,
+                        isDefault: false
+                    });
+                    this.saveState();
+                    document.getElementById('new-cat-name').value = '';
+                    this.showToast('Kategoriya qo\'shildi');
+                    this.renderSettings();
+                }
+            });
+
+            // Export & Import
+            document.getElementById('export-json-btn').addEventListener('click', () => this.exportJSON());
+            document.getElementById('export-csv-btn').addEventListener('click', () => this.exportCSV());
+            document.getElementById('import-json-file').addEventListener('change', (e) => this.importJSON(e));
+            document.getElementById('load-demo-btn').addEventListener('click', () => this.loadDemoData());
+            document.getElementById('clear-all-btn').addEventListener('click', () => this.clearAllData());
+        }
+
+        saveTransaction() {
+            const id = document.getElementById('tx-id').value;
+            const type = document.querySelector('input[name="tx-type"]:checked').value;
+            const amount = Number(document.getElementById('tx-amount').value);
+            const currency = document.getElementById('tx-currency').value;
+            const categoryId = document.getElementById('tx-category').value;
+            const date = document.getElementById('tx-date').value;
+            const note = document.getElementById('tx-note').value.trim();
+
+            if (!amount || amount <= 0) return;
+
+            if (id) {
+                // Edit
+                const index = this.state.transactions.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    this.state.transactions[index] = { ...this.state.transactions[index], type, amount, currency, categoryId, date, note };
+                }
+            } else {
+                // Add
+                this.state.transactions.push({
+                    id: Utils.generateId(),
+                    type,
+                    amount,
+                    currency,
+                    categoryId,
+                    date,
+                    note,
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            this.saveState();
+            document.getElementById('tx-modal').classList.remove('active');
+            this.showToast('Tranzaksiya saqlandi');
+            this.renderAll();
+        }
+
+        editTx(id) {
+            const tx = this.state.transactions.find(t => t.id === id);
+            if (!tx) return;
+
+            document.getElementById('tx-id').value = tx.id;
+            document.querySelectorAll('input[name="tx-type"]').forEach(r => r.checked = (r.value === tx.type));
+            this.populateCategorySelects();
+
+            document.getElementById('tx-amount').value = tx.amount;
+            document.getElementById('tx-currency').value = tx.currency;
+            document.getElementById('tx-category').value = tx.categoryId;
+            document.getElementById('tx-date').value = tx.date;
+            document.getElementById('tx-note').value = tx.note || '';
+
+            document.getElementById('tx-modal').classList.add('active');
+        }
+
+        deleteTx(id) {
+            if (confirm('Ushbu tranzaksiyani o\'chirishni tasdiqlaysizmi?')) {
+                this.state.transactions = this.state.transactions.filter(t => t.id !== id);
+                this.saveState();
+                this.showToast('Tranzaksiya o\'chirildi');
+                this.renderAll();
+            }
+        }
+
+        saveBudget() {
+            const categoryId = document.getElementById('budget-category').value;
+            const amount = Number(document.getElementById('budget-amount').value);
+            const currency = document.getElementById('budget-currency').value;
+
+            if (!amount || amount <= 0) return;
+
+            // Replace existing budget for this category if exists
+            this.state.budgets = this.state.budgets.filter(b => b.categoryId !== categoryId);
+            this.state.budgets.push({
+                id: Utils.generateId(),
+                categoryId,
+                amount,
+                currency
+            });
+
+            this.saveState();
+            document.getElementById('budget-modal').classList.remove('active');
+            this.showToast('Oylik limit saqlandi');
+            this.renderBudgets();
+        }
+
+        deleteBudget(id) {
+            this.state.budgets = this.state.budgets.filter(b => b.id !== id);
+            this.saveState();
+            this.renderBudgets();
+        }
+
+        saveGoal() {
+            const title = document.getElementById('goal-title').value.trim();
+            const targetAmount = Number(document.getElementById('goal-target').value);
+            const currency = document.getElementById('goal-currency').value;
+            const deadline = document.getElementById('goal-deadline').value;
+
+            if (!title || !targetAmount) return;
+
+            this.state.goals.push({
+                id: Utils.generateId(),
+                title,
+                targetAmount,
+                currentAmount: 0,
+                currency,
+                deadline
+            });
+
+            this.saveState();
+            document.getElementById('goal-modal').classList.remove('active');
+            this.showToast('Maqsad saqlandi');
+            this.renderGoals();
+        }
+
+        openGoalAction(id, actionType) {
+            document.getElementById('goal-action-id').value = id;
+            document.getElementById('goal-action-type').value = actionType;
+            document.getElementById('goal-action-title').textContent = actionType === 'DEPOSIT' ? 'Mablag\' Qo\'shish' : 'Mablag\' Qaytarish';
+            document.getElementById('goal-action-amount').value = '';
+            document.getElementById('goal-action-modal').classList.add('active');
+        }
+
+        processGoalAction() {
+            const id = document.getElementById('goal-action-id').value;
+            const actionType = document.getElementById('goal-action-type').value;
+            const amount = Number(document.getElementById('goal-action-amount').value);
+
+            const goal = this.state.goals.find(g => g.id === id);
+            if (!goal || !amount) return;
+
+            if (actionType === 'WITHDRAW' && amount > goal.currentAmount) {
+                alert('Qaytarish summasi mavjud jamg\'armadan ortiq bo\'lishi mumkin emas!');
+                return;
+            }
+
+            if (actionType === 'DEPOSIT') {
+                goal.currentAmount += amount;
+            } else {
+                goal.currentAmount -= amount;
+            }
+
+            this.saveState();
+            document.getElementById('goal-action-modal').classList.remove('active');
+            this.showToast('Jamg\'arma yangilandi');
+            this.renderGoals();
+        }
+
+        deleteGoal(id) {
+            if (confirm('Jamg\'arma maqsadini o\'chirmoqchimisiz?')) {
+                this.state.goals = this.state.goals.filter(g => g.id !== id);
+                this.saveState();
+                this.renderGoals();
+            }
+        }
+
+        deleteCategory(id) {
+            const inUse = this.state.transactions.some(t => t.categoryId === id);
+            if (inUse) {
+                alert('Ushbu kategoriya bo\'yicha tranzaksiyalar mavjud! Avval ularni o\'chiring yoki o'zgartiring.');
+                return;
+            }
+
+            this.state.categories = this.state.categories.filter(c => c.id !== id);
+            this.saveState();
+            this.renderSettings();
+        }
+
+        // --- BACKUP & EXPORT ---
+        exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `hisobim_backup_${Utils.getTodayString()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        exportCSV() {
+            let csv = '\uFEFFDate,Category,Type,Amount,Currency,Note\n';
+            this.state.transactions.forEach(t => {
+                const cat = this.state.categories.find(c => c.id === t.categoryId);
+                const catName = cat ? cat.name : '';
+                const note = (t.note || '').replace(/"/g, '""');
+                csv += `"${t.date}","${catName}","${t.type}","${t.amount}","${t.currency}","${note}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `hisobim_tranzaksiyalar_${Utils.getTodayString()}.csv`;
+            link.click();
+        }
+
+        importJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (parsed && parsed.version === 1 && Array.isArray(parsed.transactions)) {
+                        if (confirm(`Zaxiradan ${parsed.transactions.length} ta tranzaksiya yuklansinmi? Mavjud ma'lumotlar almashtiriladi.`)) {
+                            this.state = parsed;
+                            this.saveState();
+                            this.showToast('Muvaffaqiyatli import qilindi');
+                            this.renderAll();
+                        }
+                    } else {
+                        alert('JSON fayl formati noto\'g\'ri!');
+                    }
+                } catch (err) {
+                    alert('Faylni o\'qishda xatolik yuz berdi!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        loadDemoData() {
+            if (!confirm('Demo ma\'lumotlar yuklansinmi?')) return;
+
+            const today = Utils.getTodayString();
+            this.state.transactions = [
+                { id: Utils.generateId(), type: 'INCOME', amount: 10000000, currency: 'UZS', categoryId: 'c1', date: today, note: 'Oylik maosh', createdAt: new Date().toISOString() },
+                { id: Utils.generateId(), type: 'INCOME', amount: 500, currency: 'USD', categoryId: 'c2', date: today, note: 'Freelance proyekt', createdAt: new Date().toISOString() },
+                { id: Utils.generateId(), type: 'EXPENSE', amount: 450000, currency: 'UZS', categoryId: 'c6', date: today, note: 'Supermarket', createdAt: new Date().toISOString() },
+                { id: Utils.generateId(), type: 'EXPENSE', amount: 120, currency: 'USD', categoryId: 'c13', date: today, note: 'Kiyim-kechak', createdAt: new Date().toISOString() }
+            ];
+
+            this.state.budgets = [
+                { id: Utils.generateId(), categoryId: 'c6', amount: 2000000, currency: 'UZS' }
+            ];
+
+            this.state.goals = [
+                { id: Utils.generateId(), title: 'Noutbuk olish', targetAmount: 1000, currentAmount: 350, currency: 'USD', deadline: '' }
+            ];
+
+            this.saveState();
+            this.showToast('Demo ma\'lumotlar yuklandi');
+            this.renderAll();
+        }
+
+        clearAllData() {
+            if (confirm('Barcha ma\'lumotlarni o\'chirishni tasdiqlaysizmi? Bu amalni ortga qaytarib bo\'lmaydi!') &&
+                confirm('Haqiqatdan ham barchasini tozalashga rozimisiz?')) {
+                this.state = Storage.getInitialData();
+                this.saveState();
+                this.showToast('Barcha ma\'lumotlar tozalandi');
+                this.renderAll();
+            }
+        }
+    }
+
+    // Initialize App when DOM Ready
+    let app;
+    document.addEventListener('DOMContentLoaded', () => {
+        app = new HisobimApp();
+    });
+    </script>
+</body>
+</html>
